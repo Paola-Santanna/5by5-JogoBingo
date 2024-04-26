@@ -1,92 +1,139 @@
 ﻿//Jogo de Bingo
 //link da descrição: https://github.com/Felipe-Pestana/JogoBingo
 
-int qnt_jogadores = 0, qnt_jogadores2 = 0, qnt_cartelas, indice_linha_cartela = 0, indice_coluna_cartela = 0, total_linhas = 5, total_colunas = 5;
-int num_sorteado;
+int qnt_jogadores = 0, qnt_cartelas = 0, qnt_linhas = 5, qnt_colunas = 5, cont_identifica_cartela = 0;
+int[,] cartela_criada;
 
-int[] qnt_cartelas_cada_jogador = new int[qnt_jogadores];
-
-int[,] cartela = new int[indice_linha_cartela, indice_coluna_cartela];
 
 //Funções
-void CriarCartela()
+void Pular2Linhas()
 {
-    for (int linha = 0; linha < total_linhas; linha++)
-    {
-        cartela[indice_coluna_cartela, indice_linha_cartela] = new Random().Next();
-    }
+    Console.WriteLine();
+    Console.WriteLine();
 }
 
-void MostrarCartela(int[,] cartelaImpressa)
+Console.WriteLine("--- Jodo do Bingo ---\n");
+Console.WriteLine("Mínimo de jogadores: 2");
+Console.WriteLine("Cada jogador tem a mesma quantidade de cartela, a partir de 1");
+Pular2Linhas();
+
+int[,] CriarCartela()
 {
-    for (int linha = 0; linha < total_linhas; linha++)
+    int[,] cartela = new int[qnt_linhas, qnt_colunas];
+    for (int linha = 0; linha < qnt_linhas; linha++)
     {
-        Console.WriteLine();
-        for (int coluna = 0; coluna < total_colunas; coluna++)
+        for (int coluna = 0; coluna < qnt_colunas; coluna++)
         {
-            Console.Write(cartelaImpressa[linha, coluna] + " ");
+            cartela[linha, coluna] = new Random().Next(1, 99);
         }
     }
+    return cartela;
 }
 
-void Sorteio()
+void MostrarCartela(int[,] cartela)
 {
-    num_sorteado = new Random().Next(1, 99);
+    for (int linha = 0; linha < qnt_linhas; linha++)
+    {
+        Console.WriteLine();
+        for (int coluna = 0; coluna < qnt_colunas; coluna++)
+        {
+            Console.Write(cartela[linha, coluna] + " ");
+        }
+    }
+    Pular2Linhas();
 }
 
-int ReceberQuantidadeJogadores()
+//Definindo a quantidade de jogadores
+int QntJogadores()
 {
     do
     {
-        Console.WriteLine("Insira a quantidade de Jogadores:");
+        Console.Write("Insira a quantidade de jogadores: ");
         qnt_jogadores = int.Parse(Console.ReadLine());
-    } while (qnt_jogadores < 1);
+    } while (qnt_jogadores < 2);
+    Pular2Linhas();
     return qnt_jogadores;
-} //ok
+}
 
-qnt_jogadores2 = ReceberQuantidadeJogadores();
-int ReceberQuantidadeCartelasCadaJogador(int qnt_jogadores)
+int QntCartelas()
 {
-    qnt_cartelas = 0;
-    for (int jogador = 0; jogador < qnt_jogadores; jogador++)
+    do
     {
-        Console.WriteLine($"{jogador + 1}º jogador, insira a quantidade de cartelas que você quer: ");
+        Console.Write("Insira a quantidade de cartelas: ");
         qnt_cartelas = int.Parse(Console.ReadLine());
-        qnt_cartelas_cada_jogador[qnt_jogadores] = qnt_cartelas; //Entender como resolve esse erro
-    }
+    } while (qnt_cartelas < 0);
+    Pular2Linhas();
     return qnt_cartelas;
 }
 
-void SortearNumerosCadaCartela()
+void CartelasParaCadaJogador()
 {
-    for (int jogador = 0; jogador < qnt_jogadores; jogador++)
+    for (int indice_jogador = 0; indice_jogador < qnt_jogadores; indice_jogador++)
     {
-        for (int cartela_do_jogador = 0; cartela_do_jogador < qnt_cartelas_cada_jogador[cartela_do_jogador]; cartela_do_jogador++)
+        Console.WriteLine($"{indice_jogador+1}º jogador");
+
+        for (int indice_cartela = 0; indice_cartela < qnt_cartelas; indice_cartela++)
         {
-            CriarCartela();
+            Console.WriteLine($"Cartela {indice_cartela+1}: ");
+            cartela_criada = CriarCartela();
+            MostrarCartela(cartela_criada);
         }
+        Pular2Linhas();
     }
 }
 
 
-ReceberQuantidadeJogadores();
-ReceberQuantidadeCartelasCadaJogador(qnt_jogadores2);
-SortearNumerosCadaCartela();
-MostrarCartela(cartela);
+//Identificar a cartela
+//int PreencherCartelas(int qnt_jogadores, int qnt_cartelas)
+//{
+//    if (qnt_jogadores > qnt_cartelas)
+//    {
 
-
+//        for (int indice_jogador = 0; indice_jogador < qnt_jogadores; indice_jogador++)
+//        {
+//            for (int indice_cartela = 0; indice_cartela < qnt_cartelas; indice_cartela++)
+//            {
+//                identificador_cartela[indice_jogador, indice_cartela] = cont_identifica_cartela;
+//                cont_identifica_cartela += 1;
+//            }
+//        }
+//    }
+//    else
+//    {
+//        int indice_jogador = 0;
+//        for (int indice_cartela = 0; indice_cartela < qnt_cartelas; indice_cartela++)
+//        {
+//            for (indice_jogador = 0; indice_jogador < qnt_jogadores; indice_jogador++)
+//            {
+//                identificador_cartela[indice_jogador, indice_cartela] = cont_identifica_cartela;
+//                cont_identifica_cartela += 1;
+//            }
+//        }
+//    }
+//    return cont_identifica_cartela;
+//}
 
 
 /* Tópicos do jogo
  * 
  * Definir a quantidade de jogadores
  * Definir a quantidade de cartelas que cada jogador quer
- * Criar as cartelas
+ * 
+ * Criar as cartelas, de acordo com cada jogador e a quantidade de cartelas escolhidas
  * 
  * Criar um algorítmo para sortear os 25 números
  * A rodada se refe a cada vez que um número é sorteado
  * Em cada rodada, fazer a verificação dos números de cada cartela, de cada um dos jogadores
  * 
  */
+
+//Execução do Programa
+QntJogadores();
+QntCartelas();
+CartelasParaCadaJogador();
+
+//PreencherCartelas(qnt_jogadores, qnt_cartelas);
+//Console.WriteLine(qnt_cartelas);
+
 Console.WriteLine("Pressione Enter para encerrar...");
 Console.ReadKey();
