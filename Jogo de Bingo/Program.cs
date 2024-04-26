@@ -1,10 +1,16 @@
 ﻿//Jogo de Bingo
 //link da descrição: https://github.com/Felipe-Pestana/JogoBingo
 
+using System.Drawing;
+
 int qnt_jogadores, qnt_cartelas, qnt_linhas = 5, qnt_colunas = 5, num_sorteado;
 int[,] cartela_criada;
+int[,] cartela_sorteada_copia = new int[qnt_linhas, qnt_colunas];
+int[,] cartela_sorteada_final = new int[qnt_linhas, qnt_colunas];
 int[,] cartela_criada_aux;
 int[,] cartela_criada_final = new int[qnt_linhas, qnt_colunas];
+bool cartela_nao_copiada = false;
+
 
 //Funções
 void Pular2Linhas()
@@ -27,8 +33,42 @@ int[,] CriarCartela()
         {
             cartela[linha, coluna] = new Random().Next(1, 99);
         }
+
+        cartela_sorteada_copia = cartela;
+        cartela_sorteada_final = cartela;
+
+        do
+        {
+            for (int linha2 = 0; linha2 < qnt_linhas; linha2++)
+            {
+                for (int comparacao_linha = linha2 + 1; comparacao_linha < qnt_linhas; comparacao_linha++)
+                {
+                    for (int coluna = 0; coluna < qnt_colunas; coluna++)
+                    {
+                        for (int comparacao_coluna = coluna + 1; comparacao_coluna < qnt_colunas; comparacao_coluna++)
+                        {
+                            if (cartela[linha, coluna] == cartela[comparacao_linha, comparacao_coluna])
+                            {
+                                cartela[linha, coluna] = new Random().Next(1, 99);
+
+                                if (cartela[linha, coluna] == cartela_sorteada_final[linha, coluna])
+                                {
+                                    cartela[linha, coluna] = new Random().Next(1, 99);
+                                    cartela_sorteada_final[linha, coluna] = cartela[linha, coluna];
+                                }
+
+                            }
+                            else
+                                cartela_nao_copiada = true;
+                        }
+                    }
+                }
+            }
+        } while (cartela_nao_copiada != true);
     }
-    return cartela;
+
+
+    return cartela_sorteada_final;
 }
 
 void MostrarCartela(int[,] cartela)
@@ -75,11 +115,14 @@ int[,] CartelasParaCadaJogador()
 
         for (int indice_cartela = 0; indice_cartela < qnt_cartelas; indice_cartela++)
         {
+            Console.WriteLine($"Cartela {indice_cartela + 1}: ");
+
+
             cartela_criada = CriarCartela();
             cartela_criada_aux = cartela_criada;
-            cartela_criada = CriarCartela();
-            Console.WriteLine($"Cartela {indice_cartela + 1}: ");
             cartela_criada_final = cartela_criada_aux;
+
+
 
             if (cartela_criada == cartela_criada_final)
             {
