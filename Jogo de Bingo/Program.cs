@@ -1,221 +1,153 @@
-﻿//Jogo de Bingo
-//link da descrição: https://github.com/Felipe-Pestana/JogoBingo
+﻿//Declaração de variáveis
+int qtdJogadores = 0, qtdCartelas = 0;
+int totalLinhas = 5, totalColunas = 5;
+int contNumSorteadosCartela = 1;
+int numSorteado;
+int indice = -1;
 
-// Variáveis
-int qtdJogadores;
-int qtdCartelas;
-int qtdLinhas = 5, qtdColunas = 5;
-int pontos;
-int rodadas = 0;
-int contadorNumSorteadoColuna;
-int contadorNumSorteadoLinha;
-int numeroSorteado;
-int resposta;
+bool numRepetido = true;
 
-bool fimDoJogo;
-bool colunaPreenchida;
-bool linhaPreenchida;
-bool proxFaseBingo;
+/*
+ * Vetor para armazenar os números que já foram sorteados na cartela.
+ * VetorNumSorteadosParaCartela = Vetor de Números Sorteados para a Cartela
+*/
+int[] vetorNumSorteadosParaCartela = new int[25];
 
-int[] vetorNumSorteados_aux;
-int[] vetorNumSorteados = new int[rodadas];
-int[] vetorCartela;
+/*
+ * Essa variável irá armazenar os números da cartela para o sorteio.
+ * Recebe como valores máximos de dimensão, a quantidade total de linhas e o total de colunas
+*/
+int[,] cartelaCriada = new int[totalLinhas, totalColunas];
+int[,] cartelaCriada_aux;
 
-int[,] matrizCriarCartela = new int[qtdLinhas, qtdColunas];
-int[,] cartelaCriada;
+/*
+ * Essa vairável vai atribuir na primeira matriz:
+ * linha: será referente ao jogador
+ * coluna: será referente à cartela
+ * 
+ * Na segunda matriz, poderá ser armazenada a cartela criada.
+ * 
+ * Assim, a cartela criada terá a referência do jogador e da cartela atribuída à esse jogador
+ */
+int[,][,] cartela = new int[qtdJogadores, qtdCartelas][,];
 
-//Funções
-
-void Pular2Linhas()
+//Função para pular linha e visualizar melhor as informações impressas
+void PularLinha()
 {
     Console.WriteLine();
     Console.WriteLine();
 }
-int[,] CriarCartela()
+
+int SortearNumCartela()
 {
-    for (int linha = 0; linha < qtdLinhas; linha++)
+    contNumSorteadosCartela += 1;
+    vetorNumSorteadosParaCartela = new int[contNumSorteadosCartela];
+    numSorteado = new Random().Next(1, 99);
+    indice += 1;
+    vetorNumSorteadosParaCartela[indice] = numSorteado;
+
+    for (int indice_aux = 0; indice_aux < contNumSorteadosCartela; indice_aux++)
     {
-        for (int coluna = 0; coluna < qtdColunas; coluna++)
-            matrizCriarCartela[linha, coluna] = new Random().Next(1, 26);
-    }
-    return matrizCriarCartela;
-}
-void MostrarCartela(int[,] matriz)
-{
-    for (int linha = 0; linha < qtdLinhas; linha++)
-    {
-        for (int coluna = 0; coluna < qtdColunas; coluna++)
+        numRepetido = true;
+        do
         {
-            Console.Write(matriz[linha, coluna] + " ");
-        }
-        Console.WriteLine();
-    }
-}
-
-void IdentificarCartela(int qtdJogadores, int qtdCartelas)
-{
-    for (int indiceJogador = 0; indiceJogador < qtdJogadores; indiceJogador++)
-    {
-        Pular2Linhas();
-        Console.WriteLine($"{indiceJogador + 1}º jogador");
-
-        for (int indiceCartela = 0; indiceCartela < qtdCartelas; indiceCartela++)
-        {
-            int[,] cartelaCriada_final = new int[qtdLinhas, qtdColunas];
-            Console.WriteLine();
-            Console.WriteLine($"{indiceCartela + 1}ª cartela:\n");
-            cartelaCriada = CriarCartela();
-            MostrarCartela(cartelaCriada);
-        }
-    }
-}
-
-int SortearNumero()
-{
-    int numSorteado = new Random().Next(1, 99);
-    rodadas += 1;
-
-    for (int indiceRodada = 0; indiceRodada < rodadas; indiceRodada++)
-    {
-        vetorNumSorteados = new int[rodadas];
-        vetorNumSorteados[indiceRodada] = numSorteado;
-    }
-
-    bool numNaoRepetido = false;
-    do
-    {
-        for (int indiceNumSorteado = 0; indiceNumSorteado < rodadas; indiceNumSorteado++)
-        {
-            if (vetorNumSorteados[indiceNumSorteado] == numSorteado)
+            if (vetorNumSorteadosParaCartela[indice_aux] != numSorteado)
             {
-                numSorteado = new Random().Next(1,99);
+                numRepetido = false;
             }
-        }
-        numNaoRepetido = true;
-    } while (numNaoRepetido != true);
+            else
+                numSorteado = new Random().Next(1, 99);
+        } while (numRepetido);
+    }
 
+    vetorNumSorteadosParaCartela[indice] = numSorteado;
+
+    numRepetido = true;
     return numSorteado;
 }
 
-int[] ListarNumSorteados(int numSorteado)
+/*
+ * Função para criar a cartela, com as dimensões de 5x5 e retornar a cartela criada.
+*/
+int[,] CriarCartela()
 {
-    for (int indiceRodada = 0; indiceRodada < rodadas; indiceRodada++)
-    {
-        vetorNumSorteados = new int[rodadas];
-        vetorNumSorteados[indiceRodada] = numSorteado;
-    }
-    return vetorNumSorteados;
-}
+    int contInicio = 1;
+    int numSorteadoParaCartela;
 
-bool VerificarColunaPreenchida(int[,] cartela, int[] VetorNumSorteados)
-{
-    int rodadasExecutadas = SortearNumero();
-    while (rodadasExecutadas != 0)
+    for (int linha = 0; linha < totalLinhas; linha++)
     {
-        for (int indiceColuna = 0; indiceColuna < qtdColunas; indiceColuna++)
+        for (int coluna = 0; coluna < totalColunas; coluna++)
         {
-            for (int indiceLinha = 0; indiceLinha < qtdLinhas; indiceLinha++)
-            {
-                for (int indiceVetorNumSorteados = 0; indiceVetorNumSorteados < rodadasExecutadas; indiceVetorNumSorteados++)
-                {
-                    if (cartela[indiceLinha, indiceColuna] == VetorNumSorteados[indiceVetorNumSorteados])
-                    {
-                        contadorNumSorteadoColuna += 1;
+            numSorteadoParaCartela = SortearNumCartela();
+            cartelaCriada[linha, coluna] = numSorteadoParaCartela;
 
-                        if (contadorNumSorteadoColuna == 5)
+            /*
+             * Trecho para evitar a repetição de números iguais
+             * 
+             * A partir do vetor de números que já foram sorteados na cartela,
+             * haverá a verificação do número repetido na cartelaCriada.
+             * Caso esteja repetido, o número será sorteado novamente.
+             * Caso não, o sorteio do número para a tabela continuará para as outras posições da matriz.
+             */
+
+            if (contInicio != 0)
+            {
+
+                for (int indiceVetor = 0; indiceVetor < contNumSorteadosCartela; indiceVetor++)
+                {
+                    do
+                    {
+                        if (cartelaCriada[linha, coluna] == vetorNumSorteadosParaCartela[indiceVetor])
                         {
-                            colunaPreenchida = true;
+                            numSorteadoParaCartela = SortearNumCartela();
+                            cartelaCriada[linha, coluna] = numSorteadoParaCartela;
                         }
                         else
-                            colunaPreenchida = false;
-                    }
-                }
-            }
-        }
-        rodadasExecutadas -= 1;
-    }
-
-    return colunaPreenchida;
-}
-
-bool VerificarLinhaPreenchida(int[,] cartela, int[] VetorNumSorteados)
-{
-    int rodadasExecutadas = SortearNumero();
-    int rodadasExecutadas_aux = 0;
-    while (rodadasExecutadas_aux != rodadasExecutadas)
-    {
-        for (int indiceLinha = 0; indiceLinha < qtdLinhas; indiceLinha++)
-        {
-            for (int indiceColuna = 0; indiceColuna < qtdColunas; indiceColuna++)
-            {
-                for (int indiceVetorNumSorteados = 0; indiceVetorNumSorteados < rodadasExecutadas; indiceVetorNumSorteados++)
-                {
-                    if (cartela[indiceLinha, indiceColuna] == VetorNumSorteados[indiceVetorNumSorteados])
-                    {
-                        contadorNumSorteadoLinha += 1;
-
-                        if (contadorNumSorteadoLinha == 5)
                         {
-                            linhaPreenchida = true;
+                            numRepetido = false;
                         }
-                        else
-                            linhaPreenchida = false;
-                    }
+                    } while (numRepetido != false);
                 }
             }
+            contInicio--;
         }
-        rodadasExecutadas_aux += 1;
     }
-
-    return linhaPreenchida;
+    return cartelaCriada;
 }
 
+/*
+ * Essa função será usada para monitorar os números sorteados, durante a construção do código.
+*/
+void MostrarCartela(int[,] matriz)
+{
+    for (int linha = 0; linha < totalLinhas; linha++)
+    {
+        for (int coluna = 0; coluna < totalColunas; coluna++)
+        {
+            Console.Write(matriz[linha, coluna] + "\t");
+        }
+        Console.WriteLine();
+    }
+};
 
-//Execução do Programa
-Console.WriteLine("Insira a quantidade de jogadores: ");
+//Descrição do Jogo para o usuário
+Console.WriteLine("--- Jogo de Bingo ---");
+Console.WriteLine("\nRegras:");
+Console.WriteLine("- Devem haver, pelo menos, 2 jogadores");
+Console.WriteLine("- A quantidade de tabelas é a mesma para cada jogador");
+Console.WriteLine("- Para uma coluna completa, o jogador recebe 1 ponto");
+Console.WriteLine("- Para uma linha completa, o jogador recebe 1 ponto");
+Console.WriteLine("- Para a cartela completa, o jogador recebe 5 pontos");
+Console.WriteLine("- O jogador com mais pontos vence.");
+PularLinha();
+
+//Início do programa
+Console.WriteLine("Informe a quantidade de jogadores:");
 qtdJogadores = int.Parse(Console.ReadLine());
-Console.WriteLine("Insira a quantidade de cartelas: ");
+Console.WriteLine("Informe a quantidade de cartelas: ");
 qtdCartelas = int.Parse(Console.ReadLine());
+PularLinha();
 
-do
-{
-    IdentificarCartela(qtdJogadores, qtdCartelas);
-    Pular2Linhas();
-    Console.WriteLine($"Deseja sortear o {rodadas + 1}° número? ");
-    Console.Write("Digite: \n1 -> Sim \n2 -> Não \nSua resposta: ");
-    resposta = int.Parse(Console.ReadLine());
-
-    switch (resposta)
-    {
-        case 1:
-            numeroSorteado = SortearNumero();
-            vetorNumSorteados_aux = ListarNumSorteados(numeroSorteado);
-            break;
-
-        case 2:
-            Pular2Linhas();
-            Console.WriteLine("Encerrando o jogo...");
-            break;
-
-        default:
-            Pular2Linhas();
-            Console.WriteLine("Resposta Inválida");
-            break;
-    }
-
-} while (resposta != 2);
-
-
-Pular2Linhas();
-Console.WriteLine(rodadas);
-
-
-//do
-//{
-//    // Operações de sorteio e recolhimento da coluna ou da linha completada
-
-//} while (fimDoJogo = false);
-
-Pular2Linhas();
-Console.WriteLine("Pressione Enter para encerrar...");
-Console.ReadKey();
+//Testagem do funcionamento das funções
+cartelaCriada_aux = CriarCartela();
+MostrarCartela(cartelaCriada_aux);
