@@ -219,42 +219,12 @@ void AtribuirCartela()
             Console.WriteLine();
 
             numSorteadoTemporario = SortearNumBingo();
-
             VerificarColuna(vetorNumSorteadosBingo, contNumSorteadosBingo, cartelaJogadorAtual_aux, indiceJogador);
-
 
         }
 
         PularLinha();
     }
-
-    do
-    {
-        Console.WriteLine("============================================");
-        Console.WriteLine("Sortear número? ");
-        Console.WriteLine("1 - Sim");
-        Console.WriteLine("2 - Não");
-        sortearNumero = int.Parse(Console.ReadLine());
-
-        switch (sortearNumero)
-        {
-            case 1:
-                Console.WriteLine("Próximo número: ");
-                PularLinha();
-                MostrarCartela(cartelaJogadorAtual_aux);
-                numSorteadoTemporario = SortearNumBingo();
-                break;
-
-            case 2:
-                Console.WriteLine("Encerrando...");
-                break;
-
-            default:
-                Console.WriteLine("Opção Inválida!");
-                break;
-        }
-        Console.WriteLine("============================================");
-    } while (sortearNumero != 2);
 }
 
 bool VerificarColuna(int[] numQueJaForamSorteados, int contadorRodadas, int[,] cartela, int indiceJogador)
@@ -291,6 +261,43 @@ bool VerificarColuna(int[] numQueJaForamSorteados, int contadorRodadas, int[,] c
 //{
 
 //}
+
+bool PerguntarParaSortearNum(int[,] cartela)
+{
+    bool resposta;
+    do
+    {
+        Console.WriteLine("============================================");
+        Console.WriteLine("Sortear número? ");
+        Console.WriteLine("1 - Sim");
+        Console.WriteLine("2 - Não");
+        sortearNumero = int.Parse(Console.ReadLine());
+
+        switch (sortearNumero)
+        {
+            case 1:
+                Console.WriteLine("Próximo número: ");
+                PularLinha();
+                MostrarCartela(cartela);
+                resposta = true;
+                break;
+
+            case 2:
+                Console.WriteLine("Encerrando...");
+                resposta = false;
+                break;
+
+            default:
+                Console.WriteLine("Opção Inválida!");
+                resposta = false;
+                break;
+        }
+        Console.WriteLine("============================================");
+    } while (sortearNumero != 2);
+
+
+    return resposta;
+}
 
 //Descrição do Jogo para o usuário
 Console.WriteLine("--- Jogo de Bingo ---");
